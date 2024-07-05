@@ -1,5 +1,5 @@
 local config = {
-    TargetSimSpeed = 0.5
+    TargetSimSpeed = 0.2
 }
 
 local RealAdjustSimulationSpeed = AdjustSimulationSpeed
@@ -14,6 +14,7 @@ AdjustSimulationSpeed = function(args)
     else
         LerpFinishesAtTime = nil
     end
+    print("Set sim speed", AdjustedSimSpeed, args.LerpTime)
     RealAdjustSimulationSpeed({
         Fraction = AdjustedSimSpeed,
         LerpTime = args.LerpTime
@@ -28,15 +29,18 @@ OnAnyLoad {
             if LerpFinishesAtTime ~= nil and _worldTime > LerpFinishesAtTime then
                 LerpFinishesAtTime = nil
             end
-            if LerpFinishesAtTime ~= nil then
+            if LerpFinishesAtTime == nil then
                 if AdjustedSimSpeed ~= config.TargetSimSpeed then
                     print("Refresh with active adjustment:", AdjustedSimSpeed)
                 end
                 -- No active lerp; refresh to ensure the timer doesn't run out
+                print("Reset sim speed", AdjustedSimSpeed, 0)
                 RealAdjustSimulationSpeed({
                     Fraction = AdjustedSimSpeed,
                     LerpTime = 0
                 })
+            else
+                print("Waiting:", _worldTime, LerpFinishesAtTime)
             end
             wait(.1)
         end
